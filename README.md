@@ -1,59 +1,93 @@
-# नाहटा · Nahata TV
+# Nahata TV
 
-**Your home. Your screen.** An original, quiet Android TV launcher developed by **Param Nahata**.
+### Your screen. A quieter kind of home.
 
-[Website](https://paramnahata.com) · [Feature roadmap](docs/ROADMAP.md) · [Privacy](PRIVACY.md)
+An original Android TV launcher developed by **Param Nahata** — a glass dock, calm scenery and controls that stay out of the way.
 
-## Current development version: 0.5.0
+[![Android build](https://github.com/paramnahata/nahata-tv/actions/workflows/android.yml/badge.svg)](https://github.com/paramnahata/nahata-tv/actions/workflows/android.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-d8c49c.svg)](LICENSE)
+[![Android 9+](https://img.shields.io/badge/Android-9%2B-7db4a2.svg)](docs/COMPATIBILITY.md)
 
-Light and Dark appearance now have separate original daytime and moonlit Alpine wallpapers. Choose Alpine, Sunset or Aurora under Background. Subtle ambient motion can be toggled off and respects system disabled animations. Home has no large selected-app heading; a small developer credit sits at the bottom right.
+[Download preview](https://github.com/paramnahata/nahata-tv/releases/tag/v0.5.1) · [Install & recover](docs/INSTALL.md) · [Phone remote](docs/REMOTE.md) · [Website](https://paramnahata.com)
 
-Hold OK on a Home app → Rearrange. Left/Right moves it, OK saves the order, and Back cancels without changing the saved order. Hidden Home apps remain in Apps.
+![Nahata TV running on the development TV: midnight scenery and glass dock](docs/screenshots/home-midnight.png)
 
-The Home uses one centred lower glass dock and a sliding focus highlight. Appearance offers Midnight Dark and Pearl Light, with theme-matched native dialogs. No instructional copy or widgets appear on Home. See [ASSETS.md](ASSETS.md) for wallpaper provenance and generation prompts.
+**Development preview, not firmware.** Tested on one Hisense Android 9 TV; broader compatibility is unverified. The custom browser remote currently requires a laptop. A laptop-free native Nahata phone app is not included.
 
-Home shows Netflix, Prime Video, YouTube and Live TV by default. Open the compact Apps icon for the complete collection. Hold OK on any app to Show on Home or Hide on Home; hiding never uninstalls it or removes it from Apps. Wi-Fi, input selection, remote help, personalisation, settings and About use compact accessible icon controls. The small Jio shortcut opens HDMI 2 on the verified development TV.
+## A home with room to breathe
 
-Includes glass-style panels, a static aurora gradient, horizontal app sliders and a verified HDMI 2 shortcut on the development Hisense. Back on the Home root stays in Nahata TV. Back in Apps returns Home.
+- One centred glass dock with a sliding focus highlight and D-pad navigation.
+- Midnight Dark / Pearl Light, original day/night scenery, Sunset and Aurora backgrounds.
+- Subtle ambient motion with an off switch and respect for system disabled animations.
+- Netflix, Prime Video, YouTube and Live TV on Home when installed; everything else in Apps.
+- Hold OK to Show/Hide on Home or Rearrange. Left/Right moves, OK saves, Back cancels.
+- Compact Wi-Fi, input, remote, appearance, settings and About controls.
+- User-selectable Jio input, local preferences and a small developer credit.
+- No advertisements, accounts, analytics or Internet permission in the launcher.
 
-Some Hisense firmware ignores the preferred Home selection because its system launcher has higher priority. An optional **Nahata TV Home override** accessibility service routes stock-launcher window events back to Nahata. Enable it only with informed consent. Its configuration is limited to `typeWindowStateChanged` from `com.google.android.tvlauncher`; it cannot retrieve screen content. Personalise → Switch to original launcher pauses the override; open Nahata TV from Apps to reactivate it. No stock launcher is disabled. Disable the service in system Accessibility settings to remove the override completely.
+## See it on a TV
 
-[Nahata Remote](remote/README.md) is an included local browser remote for Android/iPhone with an authenticated laptop bridge. The laptop must remain awake. It is not a standalone phone app or an offline PWA. See the remote README for trusted-Wi-Fi restrictions and English-only typing limitations.
+![Sunset Home with a user-rearranged dock, captured on the development TV](docs/screenshots/home-sunset.png)
 
-See [CHANGELOG.md](CHANGELOG.md) for current changes. The section below describes the original preview, not the complete current feature set.
+The screenshots above are real device captures from v0.5.0. v0.5.1 preserves this appearance and adds portable input setup and clearer remote guidance.
 
-## Implemented in 0.1.0
+<details>
+<summary>More visuals: dialog styling and source scenery</summary>
 
-- Brief Devanagari logo reveal and staggered home entrance; respects system animation-off setting.
-- Native D-pad focus, installed TV and regular app discovery, alphabetical grid and local search.
-- Long-press app actions: favourites, hide, and Android app information.
-- Restore hidden apps, spacious/compact grid, saffron/mint accent and custom welcome message.
-- TV settings and system input-settings shortcuts with a firmware fallback message.
-- Persistent local preferences, About page and “Developed by Param Nahata” credit.
-- No Internet permission, accounts, advertisements, analytics or external runtime libraries.
+![Theme-matched dialog styling, captured in v0.4.0](docs/screenshots/personalise.png)
 
-## Status
+The dialog capture illustrates the styling; current menu entries differ. The images below are bundled background assets, not screenshots of a running light-theme TV.
 
-Early development build. The launcher and HDMI 2 shortcut have been tested on a Hisense HiSmartTV A4 running Android 9; this does not establish compatibility with other firmware. Phone hardware testing and broader lifecycle validation remain necessary. This project does not contain Projectivy code and is not affiliated with Projectivy or Google.
+| Daylight scenery | Moonlit scenery |
+| --- | --- |
+| ![Original daytime wallpaper](app/src/main/res/drawable-nodpi/alpine_day.png) | ![Original night wallpaper](app/src/main/res/drawable-nodpi/alpine_night.png) |
 
-## Build
+Wallpaper provenance and generation prompts: [ASSETS.md](ASSETS.md).
 
-Use Android Studio with JDK 17+ and Android SDK 35. Run `./gradlew assembleDebug` (Windows: `gradlew.bat assembleDebug`). The included wrapper uses Gradle 8.13. Run `./gradlew lintDebug` for static checks. A GitHub Actions build workflow is included; it has not yet run on GitHub.
+</details>
 
-Output: `app/build/outputs/apk/debug/app-debug.apk`. Debug signing is for development; use your own private release key for distribution. Never commit signing keys.
+## Get started
 
-## Install later, when the TV is available
+1. Download the APK and checksums from [Releases](https://github.com/paramnahata/nahata-tv/releases/tag/v0.5.1).
+2. Install on a compatible Android TV 9+ using the TV's supported installation flow or authorised ADB. Keep the original launcher enabled.
+3. Open Nahata TV from Apps, test your remote and app launching, then configure Home behaviour if your firmware permits.
+4. Brush icon → Choose Jio input selects your actual HDMI port. Android TV boxes may not expose the physical television's inputs.
 
-Keep your stock launcher enabled. Install the APK manually, open Nahata TV from Apps and validate navigation and app launching before selecting it in Android's default-home settings. Do not disable firmware packages to force home behaviour.
+Full commands, APK update/signing notes and recovery: **[Install & recover](docs/INSTALL.md)**.
 
-To revert, disable Nahata TV Home override in system Accessibility settings, then select the original launcher in system default-home settings. If needed, through an already-authorized ADB connection run `adb shell cmd package set-home-activity --user 0 com.google.android.tvlauncher/.MainActivity` on the verified Hisense firmware. Remove Nahata TV through system Apps settings after reverting. No factory reset is needed.
+This APK does not run on VIDAA, Tizen or webOS. Missing streaming apps are not downloaded or bundled. App names/icons belong to their respective owners.
 
-## Contributing
+## Phone remote: what actually works without a laptop?
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). Include TV model, Android version, reproduction steps and redacted logs in bug reports. Screenshots and compatibility reports are welcome. Do not submit third-party proprietary code or copyrighted artwork without permission.
+For a compatible Android TV, use the **Google TV app on Android or iPhone** with local pairing. The TV service must support it; confirm on your own device.
 
-## Author and license
+The included `remote/` browser UI is an optional authenticated laptop bridge. Uploading its HTML/JS to public PHP/static hosting does not remove the bridge requirement. A future original native phone client is the recommended custom direction, but is not shipped here.
 
-Developed by Param Nahata · https://paramnahata.com
+Read **[Remote architecture and Hostinger limitations](docs/REMOTE.md)** before choosing a setup. No public ADB exposure is needed or recommended.
 
-MIT licensed. Product name availability and trademark clearance have not been checked. Stars and GitHub trending are organic outcomes, not promised features.
+## Home, Back and the original launcher
+
+Back at Nahata's root stays on Home; Back from Apps returns Home. System Home support varies by firmware. The optional Home override receives only window-state events from `com.google.android.tvlauncher` and cannot read screen content. Enable it only with informed consent; it is not a universal OEM-launcher override.
+
+Personalise → Switch to original launcher pauses the override. Reopen Nahata TV to resume. To remove the override fully, disable its service in Android Accessibility settings and restore your original default Home. No stock launcher is disabled or removed.
+
+## Build and contribute
+
+JDK 17+, Android SDK 35; Gradle wrapper included:
+
+```text
+./gradlew assembleDebug lintDebug
+python -m unittest discover -s remote -p "test_*.py"
+```
+
+Windows uses `gradlew.bat`. APK output: `app/build/outputs/apk/debug/app-debug.apk`. Development signing keys can differ between published, local and CI builds; do not mix them for upgrades. See [install/update notes](docs/INSTALL.md).
+
+[Compatibility matrix](docs/COMPATIBILITY.md) · [Changelog](CHANGELOG.md) · [Roadmap](docs/ROADMAP.md) · [Contributing](CONTRIBUTING.md) · [Privacy](PRIVACY.md) · [Security](SECURITY.md)
+
+Useful contributions include device reports, accessible D-pad behaviour, translations and reproducible fixes. Redact private information from reports. If Nahata TV is useful to you, a star helps others discover it.
+
+## Author
+
+**Developed by Param Nahata** · [paramnahata.com](https://paramnahata.com)
+
+[MIT License](LICENSE). Original implementation; not affiliated with Google, Hisense, Projectivy or streaming providers.

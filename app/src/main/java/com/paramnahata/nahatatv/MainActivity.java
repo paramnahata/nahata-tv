@@ -51,7 +51,13 @@ public class MainActivity extends Activity {
         String title, key; android.graphics.drawable.Drawable icon; Intent intent;
         App(String t, String k, android.graphics.drawable.Drawable d, Intent i) {title=t;key=k;icon=d;intent=i;}
     }
-    @Override public void onCreate(Bundle state) {super.onCreate(state); prefs=getSharedPreferences("home",MODE_PRIVATE); loadApps(); render();if(state==null) entrance();}
+    @Override public void onCreate(Bundle state) {super.onCreate(state); prefs=getSharedPreferences("home",MODE_PRIVATE);rememberOriginalHome();loadApps();render();if(state==null)entrance();}
+    private void rememberOriginalHome(){
+        if(prefs.contains("originalHome"))return;
+        ResolveInfo resolved=getPackageManager().resolveActivity(new Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME),PackageManager.MATCH_DEFAULT_ONLY);
+        if(resolved!=null&&resolved.activityInfo!=null&&!resolved.activityInfo.packageName.equals(getPackageName())&&!resolved.activityInfo.packageName.equals("android"))
+            prefs.edit().putString("originalHome",new ComponentName(resolved.activityInfo.packageName,resolved.activityInfo.name).flattenToString()).apply();
+    }
     @Override protected void onNewIntent(Intent intent){super.onNewIntent(intent);setIntent(intent);allApps=false;rearranging=false;filter="";render();}
     @Override public void onBackPressed(){if(rearranging){rearranging=false;reorderDraft=null;movedFrom=-1;drawApps();}else if(allApps){allApps=false;filter="";render();}else{if(homeFocus!=null)homeFocus.requestFocus();((ScrollView)page.getParent()).smoothScrollTo(0,0);}}
     @Override public void onResume(){super.onResume();prefs.edit().putBoolean("originalMode",false).apply();loadApps();if(grid!=null)drawApps();handler.removeCallbacks(tick);handler.post(tick);startAmbient();}
@@ -173,14 +179,25 @@ public class MainActivity extends Activity {
     }
     private void openJio(){
         android.media.tv.TvInputManager manager=(android.media.tv.TvInputManager)getSystemService(TV_INPUT_SERVICE);
+        String configured=prefs.getString("jioInputId","");
+        if(manager!=null&&!configured.isEmpty())for(android.media.tv.TvInputInfo input:manager.getTvInputList())if(input.getId().equals(configured)&&input.isPassthroughInput()){
+            launch(new Intent(Intent.ACTION_VIEW,android.media.tv.TvContract.buildChannelUriForPassthroughInput(input.getId())));return;
+        }
         if(manager!=null)for(android.media.tv.TvInputInfo input:manager.getTvInputList()){
-            String label=input.loadLabel(this).toString().replace(" ","").toLowerCase(Locale.ROOT);
-            boolean verifiedHisense=input.getId().equals("com.hisense.tv.hitvinput/.hdmi.HdmiTvInputService/HW5");
+            String label=input.loadLabel(this).toString().toLowerCase(Locale.ROOT).replaceAll("[^a-z0-9]","");
+            boolean verifiedHisense=android.os.Build.DEVICE.equals("xiaoyushan")&&input.getId().equals("com.hisense.tv.hitvinput/.hdmi.HdmiTvInputService/HW5");
             if(input.getType()==android.media.tv.TvInputInfo.TYPE_HDMI&&(label.contains("hdmi2")||verifiedHisense)){
                 launch(new Intent(Intent.ACTION_VIEW,android.media.tv.TvContract.buildChannelUriForPassthroughInput(input.getId())));return;
             }
         }
-        new PremiumDialog().setTitle("HDMI 2").setMessage("HDMI 2 could not be identified on this TV. Use your remote's Input button to select it.").setPositiveButton("OK",null).show();
+        configureJio();
+    }
+    private void configureJio(){
+        android.media.tv.TvInputManager manager=(android.media.tv.TvInputManager)getSystemService(TV_INPUT_SERVICE);
+        ArrayList<android.media.tv.TvInputInfo> found=new ArrayList<>();ArrayList<String> labels=new ArrayList<>();
+        if(manager!=null)for(android.media.tv.TvInputInfo input:manager.getTvInputList())if(input.isPassthroughInput()){found.add(input);labels.add(input.loadLabel(this).toString());}
+        if(found.isEmpty()){new PremiumDialog().setTitle("Jio input").setMessage("This device does not expose a built-in HDMI input. Use the TV remote's Input button.").setPositiveButton("OK",null).show();return;}
+        new PremiumDialog().setTitle("Choose your Jio input").setItems(labels.toArray(new String[0]),(d,n)->prefs.edit().putString("jioInputId",found.get(n).getId()).apply()).setNegativeButton("Close",null).show();
     }
     private void inputs(){
         android.media.tv.TvInputManager manager=(android.media.tv.TvInputManager)getSystemService(TV_INPUT_SERVICE);
@@ -189,12 +206,15 @@ public class MainActivity extends Activity {
         new PremiumDialog().setTitle("TV inputs").setItems(labels.toArray(new String[0]),(d,n)->launch(new Intent(Intent.ACTION_VIEW,android.media.tv.TvContract.buildChannelUriForPassthroughInput(found.get(n).getId())))).setNegativeButton("Close",null).show();
     }
     private void oldLauncher(){
-        new PremiumDialog().setTitle("Switch to original launcher?").setMessage("Original launcher mode pauses Nahata's Home override. Open Nahata TV from Apps to return to your custom Home. No launcher is disabled or uninstalled.").setPositiveButton("Switch",(d,n)->{prefs.edit().putBoolean("originalMode",true).apply();launch(new Intent().setComponent(new ComponentName("com.google.android.tvlauncher","com.google.android.tvlauncher.MainActivity")));}).setNegativeButton("Cancel",null).show();
+        new PremiumDialog().setTitle("Switch to original launcher?").setMessage("Original launcher mode pauses Nahata's Home override. Open Nahata TV from Apps to return to your custom Home. No launcher is disabled or uninstalled.").setPositiveButton("Switch",(d,n)->{ComponentName original=ComponentName.unflattenFromString(prefs.getString("originalHome","com.google.android.tvlauncher/com.google.android.tvlauncher.MainActivity"));if(original!=null&&!original.getPackageName().equals(getPackageName())){prefs.edit().putBoolean("originalMode",true).apply();launch(new Intent().setComponent(original));}else launch(new Intent(Settings.ACTION_HOME_SETTINGS));}).setNegativeButton("Cancel",null).show();
     }
     private void remoteInfo(){
         String address=getIntent().getStringExtra("remote_address");
         if(address!=null)prefs.edit().putString("remoteAddress",address).apply();
-        new PremiumDialog().setTitle("Nahata Remote").setMessage("Open on your phone:\n\n"+prefs.getString("remoteAddress","Start the Nahata Remote bridge on your laptop to see its local address.")+"\n\nPhone, laptop and TV must share Wi-Fi. Enter the pairing code shown by the bridge. This version requires the laptop to stay awake.").setPositiveButton("OK",null).show();
+        new PremiumDialog().setTitle("Phone remote").setItems(new String[]{"Google TV · No laptop","Nahata browser · Laptop bridge"},(d,n)->{
+            if(n==0)new PremiumDialog().setTitle("Google TV remote").setMessage("On a compatible Android TV, install Google TV on your Android phone or iPhone. Connect phone and TV to the same Wi-Fi. In Google TV, choose Remote / Connect TV, select the TV and enter its pairing code. No laptop is needed. Availability depends on the TV's remote service.").setPositiveButton("OK",null).show();
+            else new PremiumDialog().setTitle("Nahata browser remote").setMessage("Open on your phone:\n\n"+prefs.getString("remoteAddress","Start the Nahata Remote bridge on your laptop to see its local address.")+"\n\nThis optional browser bridge requires the laptop to remain awake. It is not a standalone phone app.").setPositiveButton("OK",null).show();
+        }).setNegativeButton("Close",null).show();
     }
     private void iconAction(LinearLayout row,String kind,String label,Runnable action){
         IconView icon=new IconView(kind);style(icon);icon.setContentDescription(label);icon.setTooltipText(label);icon.setOnClickListener(v->action.run());LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(36),dp(36));p.setMargins(dp(8),0,0,0);row.addView(icon,p);
@@ -279,7 +299,7 @@ public class MainActivity extends Activity {
         if(reorderDraft==null)return;ArrayList<String> order=new ArrayList<>(reorderDraft);for(String key:homeOrder())if(!order.contains(key))order.add(key);
         prefs.edit().putString("homeOrder",new org.json.JSONArray(order).toString()).apply();rearranging=false;reorderDraft=null;movedFrom=-1;drawApps();
     }
-    private void personalise(){new PremiumDialog().setTitle("Make it yours").setItems(new String[]{"Appearance · Dark / Light","Background","Accent · Champagne / Jade","Dock · Spacious / Compact","Reset Home apps","Switch to original launcher","System accessibility settings","Ambient motion · On / Off"},(d,n)->{
+    private void personalise(){new PremiumDialog().setTitle("Make it yours").setItems(new String[]{"Appearance · Dark / Light","Background","Accent · Champagne / Jade","Dock · Spacious / Compact","Reset Home apps","Switch to original launcher","System accessibility settings","Ambient motion · On / Off","Choose Jio input"},(d,n)->{
         if(n==0)appearance();
         if(n==1)backgrounds();
         if(n==2){prefs.edit().putBoolean("saffron",!prefs.getBoolean("saffron",true)).apply();render();}
@@ -288,6 +308,7 @@ public class MainActivity extends Activity {
         if(n==6)launch(new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS));
         if(n==5)oldLauncher();
         if(n==7){prefs.edit().putBoolean("ambientMotion",!prefs.getBoolean("ambientMotion",true)).apply();startAmbient();}
+        if(n==8)configureJio();
     }).show();}
-    private void about(){new PremiumDialog().setTitle("नाहटा • Nahata TV").setMessage("Developed by Param Nahata\n\nYour home. Your screen.\nVersion 0.5.0 • MIT License\n\nOriginal Android TV launcher. No ads, accounts, analytics or network permission.\n\nHold OK on an app to show or hide it on Home. All apps remain in Apps. Jio opens HDMI 2 on supported TVs.").setPositiveButton("paramnahata.com",(d,n)->launch(new Intent(Intent.ACTION_VIEW,Uri.parse("https://paramnahata.com")))).setNegativeButton("Close",null).show();}
+    private void about(){new PremiumDialog().setTitle("नाहटा • Nahata TV").setMessage("Developed by Param Nahata\n\nYour home. Your screen.\nVersion 0.5.1 • MIT License\n\nOriginal Android TV launcher. No ads, accounts, analytics or network permission.\n\nHold OK on an app to show or hide it on Home. All apps remain in Apps. Jio opens HDMI 2 on supported TVs.").setPositiveButton("paramnahata.com",(d,n)->launch(new Intent(Intent.ACTION_VIEW,Uri.parse("https://paramnahata.com")))).setNegativeButton("Close",null).show();}
 }
