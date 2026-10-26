@@ -50,7 +50,7 @@ public class MainActivity extends Activity {
     }
     private TextView text(String s,int size,int color){TextView t=new TextView(this);t.setText(s);t.setTextSize(size);t.setTextColor(color);return t;}
     private GradientDrawable bg(int color,int stroke){GradientDrawable d=new GradientDrawable();d.setColor(color);d.setCornerRadius(dp(16));if(stroke!=0)d.setStroke(dp(2),stroke);return d;}
-    private void style(View v){v.setFocusable(true);v.setPadding(dp(16),dp(12),dp(16),dp(12));v.setBackground(bg(0xff213630,0));v.setOnFocusChangeListener((w,f)->{w.setBackground(bg(f?0xff36554a:0xff213630,f?accent:0));w.setScaleX(f?1.025f:1);w.setScaleY(f?1.025f:1);});}
+    private void style(View v){v.setFocusable(true);v.setPadding(dp(16),dp(12),dp(16),dp(12));v.setBackground(bg(0x19ffffff,0x30ffffff));v.setOnFocusChangeListener((w,f)->{w.setBackground(bg(f?0x38ffffff:0x19ffffff,f?accent:0x30ffffff));w.setScaleX(f?1.025f:1);w.setScaleY(f?1.025f:1);});}
     private Button button(String title,Runnable action){Button b=new Button(this);b.setText(title);b.setTextColor(ink);b.setTextSize(15);b.setAllCaps(false);style(b);b.setOnClickListener(v->action.run());return b;}
     private void launch(Intent i){try{startActivity(i);}catch(Exception e){new AlertDialog.Builder(this).setTitle("Unavailable on this TV").setMessage("This firmware does not expose that screen or app. Use the physical remote's Input or Settings button.").setPositiveButton("OK",null).show();}}
     private void loadApps(){
@@ -69,24 +69,27 @@ public class MainActivity extends Activity {
         accent=prefs.getBoolean("saffron",true)?0xffedbc79:0xff8bd4bd;
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN|View.SYSTEM_UI_FLAG_HIDE_NAVIGATION|View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
         ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);
-        page=new LinearLayout(this);page.setOrientation(LinearLayout.VERTICAL);page.setPadding(dp(42),dp(28),dp(42),dp(28));
-        page.setBackground(new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{0xff0c211d,0xff193c32,0xff122923}));scroll.addView(page);setContentView(scroll);
+        page=new LinearLayout(this);page.setOrientation(LinearLayout.VERTICAL);page.setPadding(dp(42),dp(24),dp(42),dp(24));
+        scroll.setBackground(new AuroraBackground());scroll.addView(page);setContentView(scroll);
         LinearLayout top=new LinearLayout(this);top.setGravity(Gravity.CENTER_VERTICAL);
-        TextView brand=text("नाहटा  /  NAHATA TV",23,accent);brand.setTypeface(null,Typeface.BOLD);top.addView(brand,new LinearLayout.LayoutParams(0,-2,1));
+        TextView brand=text("NAHATA  TV",18,ink);brand.setLetterSpacing(.16f);brand.setTypeface(null,Typeface.BOLD);top.addView(brand,new LinearLayout.LayoutParams(0,-2,1));
         clock=text("",16,muted);top.addView(clock);page.addView(top);
-        TextView greeting=text(prefs.getString("greeting","Your home. Your screen."),36,ink);greeting.setPadding(0,dp(28),0,dp(4));page.addView(greeting);
-        page.addView(text("A quieter place for your favourite apps.",16,muted));
-        LinearLayout actions=new LinearLayout(this);actions.setPadding(0,dp(22),0,dp(18));
-        addAction(actions,"Inputs / Jio",()->launch(new Intent("android.settings.TV_INPUT_SETTINGS")));
-        addAction(actions,"TV Settings",()->launch(new Intent(Settings.ACTION_SETTINGS)));
-        addAction(actions,"Personalise",this::personalise);
-        addAction(actions,"About",this::about);page.addView(actions);
-        search=new EditText(this);search.setSingleLine(true);search.setTextColor(ink);search.setHintTextColor(muted);search.setHint("Search installed apps");search.setTextSize(16);style(search);page.addView(search,new LinearLayout.LayoutParams(-1,dp(52)));
+        LinearLayout hero=new LinearLayout(this);hero.setGravity(Gravity.CENTER_VERTICAL);hero.setPadding(0,dp(26),0,dp(20));
+        LinearLayout welcome=new LinearLayout(this);welcome.setOrientation(LinearLayout.VERTICAL);
+        TextView eyebrow=text("A LITTLE LESS NOISE. A LOT MORE YOU.",11,accent);eyebrow.setLetterSpacing(.12f);welcome.addView(eyebrow);
+        TextView greeting=text(prefs.getString("greeting","Your home. Your screen."),32,ink);greeting.setPadding(0,dp(8),0,dp(8));welcome.addView(greeting);
+        welcome.addView(text("Settle in. Everything you love is right here.",14,muted));hero.addView(welcome,new LinearLayout.LayoutParams(0,-2,1));
+        LinearLayout jio=new LinearLayout(this);jio.setOrientation(LinearLayout.VERTICAL);style(jio);jio.setGravity(Gravity.CENTER_VERTICAL);
+        TextView live=text("YOUR SET-TOP BOX",10,accent);live.setLetterSpacing(.12f);jio.addView(live);jio.addView(text("Jio  ↗",27,ink));jio.addView(text("HDMI 2  •  Watch TV",13,muted));jio.setOnClickListener(v->openJio());hero.addView(jio,new LinearLayout.LayoutParams(dp(228),dp(114)));page.addView(hero);
+        LinearLayout actions=new LinearLayout(this);actions.setGravity(Gravity.CENTER_VERTICAL);actions.setPadding(0,0,0,dp(8));
+        addAction(actions,"Settings",()->launch(new Intent(Settings.ACTION_SETTINGS)));
+        addAction(actions,"Personalise",this::personalise);addAction(actions,"About",this::about);
+        search=new EditText(this);search.setSingleLine(true);search.setTextColor(ink);search.setHintTextColor(muted);search.setHint("Search apps");search.setTextSize(14);style(search);actions.addView(search,new LinearLayout.LayoutParams(dp(218),dp(46)));page.addView(actions);
         search.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence s,int a,int c,int f){}public void onTextChanged(CharSequence s,int st,int b,int c){filter=s.toString();drawApps();}public void afterTextChanged(android.text.Editable e){}});
         grid=new LinearLayout(this);grid.setOrientation(LinearLayout.VERTICAL);page.addView(grid);drawApps();
-        TextView credit=text("Developed by Param Nahata  •  paramnahata.com",12,muted);credit.setPadding(0,dp(28),0,0);page.addView(credit);
+        TextView credit=text("Developed by Param Nahata   /   paramnahata.com",10,muted);credit.setPadding(0,dp(18),0,0);page.addView(credit);
     }
-    private void addAction(LinearLayout row,String name,Runnable action){LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(54),1);p.setMargins(0,0,dp(10),0);row.addView(button(name,action),p);}
+    private void addAction(LinearLayout row,String name,Runnable action){LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(46),1);p.setMargins(0,0,dp(10),0);row.addView(button(name,action),p);}
     private Set<String> readSet(String name){return new HashSet<>(prefs.getStringSet(name,Collections.emptySet()));}
     private void drawApps(){
         grid.removeAllViews();Set<String> fav=readSet("favourites"),hidden=readSet("hidden");
@@ -98,16 +101,36 @@ public class MainActivity extends Activity {
     }
     private void section(String title,List<App> list){
         TextView label=text(title,19,ink);label.setPadding(0,dp(22),0,dp(12));grid.addView(label);
-        LinearLayout row=null;int columns=prefs.getBoolean("compact",false)?6:4;
+        HorizontalScrollView slider=new HorizontalScrollView(this);slider.setHorizontalScrollBarEnabled(false);slider.setClipChildren(false);slider.setPadding(dp(3),dp(4),dp(3),dp(4));
+        LinearLayout row=new LinearLayout(this);row.setClipChildren(false);slider.addView(row);grid.addView(slider);
         for(int n=0;n<list.size();n++){
-            if(n%columns==0){row=new LinearLayout(this);grid.addView(row);}
             App a=list.get(n);LinearLayout card=new LinearLayout(this);card.setOrientation(LinearLayout.VERTICAL);card.setGravity(Gravity.CENTER);style(card);
             ImageView icon=new ImageView(this);icon.setImageDrawable(a.icon);card.addView(icon,new LinearLayout.LayoutParams(dp(42),dp(42)));
             TextView labelApp=text(a.title,14,ink);labelApp.setGravity(Gravity.CENTER);labelApp.setMaxLines(2);card.addView(labelApp);
-            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(0,dp(112),1);p.setMargins(0,0,dp(12),dp(12));row.addView(card,p);
+            LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(dp(prefs.getBoolean("compact",false)?122:154),dp(104));p.setMargins(0,0,dp(12),dp(6));row.addView(card,p);
             card.setOnClickListener(v->launch(a.intent));card.setOnLongClickListener(v->{appOptions(a);return true;});
         }
-        if(row!=null){int missing=(columns-list.size()%columns)%columns;for(int i=0;i<missing;i++)row.addView(new View(this),new LinearLayout.LayoutParams(0,1,1));}
+    }
+    private void openJio(){
+        android.media.tv.TvInputManager manager=(android.media.tv.TvInputManager)getSystemService(TV_INPUT_SERVICE);
+        if(manager!=null)for(android.media.tv.TvInputInfo input:manager.getTvInputList()){
+            String label=input.loadLabel(this).toString().replace(" ","").toLowerCase(Locale.ROOT);
+            boolean verifiedHisense=input.getId().equals("com.hisense.tv.hitvinput/.hdmi.HdmiTvInputService/HW5");
+            if(input.getType()==android.media.tv.TvInputInfo.TYPE_HDMI&&(label.contains("hdmi2")||verifiedHisense)){
+                launch(new Intent(Intent.ACTION_VIEW,android.media.tv.TvContract.buildChannelUriForPassthroughInput(input.getId())));return;
+            }
+        }
+        new AlertDialog.Builder(this).setTitle("HDMI 2").setMessage("HDMI 2 could not be identified on this TV. Use your remote's Input button to select it.").setPositiveButton("OK",null).show();
+    }
+    private class AuroraBackground extends android.graphics.drawable.Drawable {
+        private final android.graphics.Paint paint=new android.graphics.Paint(3);
+        @Override public void draw(android.graphics.Canvas c){
+            android.graphics.Rect r=getBounds();float w=r.width(),h=r.height();
+            paint.setShader(new android.graphics.LinearGradient(0,0,w,h,new int[]{0xff10142b,0xff172940,0xff102e35},null,android.graphics.Shader.TileMode.CLAMP));c.drawRect(r,paint);
+            glow(c,w*.82f,h*.16f,w*.62f,0xff52458e);glow(c,w*.24f,h*.86f,w*.62f,0xff126a75);
+        }
+        private void glow(android.graphics.Canvas c,float x,float y,float radius,int color){paint.setShader(new android.graphics.RadialGradient(x,y,radius,new int[]{color,Color.TRANSPARENT},null,android.graphics.Shader.TileMode.CLAMP));c.drawCircle(x,y,radius,paint);}
+        @Override public void setAlpha(int a){} @Override public void setColorFilter(android.graphics.ColorFilter f){} @Override public int getOpacity(){return android.graphics.PixelFormat.OPAQUE;}
     }
     private void appOptions(App a){
         Set<String> fav=readSet("favourites");new AlertDialog.Builder(this).setTitle(a.title).setItems(new String[]{fav.contains(a.key)?"Remove favourite":"Add favourite","Hide from Nahata TV","App information"},(d,n)->{
@@ -115,12 +138,12 @@ public class MainActivity extends Activity {
             if(n==1){Set<String> h=readSet("hidden");h.add(a.key);prefs.edit().putStringSet("hidden",h).apply();}
             if(n==2)launch(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+a.key)));drawApps();}).show();
     }
-    private void personalise(){new AlertDialog.Builder(this).setTitle("Make it your Nahata TV").setItems(new String[]{"Switch saffron / mint accent","Switch spacious / compact grid","Edit welcome message","Restore all hidden apps","Choose default home app"},(d,n)->{
+    private void personalise(){new AlertDialog.Builder(this).setTitle("Make it your Nahata TV").setItems(new String[]{"Switch saffron / mint accent","Switch spacious / compact slider","Edit welcome message","Restore all hidden apps","Choose default home app"},(d,n)->{
         if(n==0){prefs.edit().putBoolean("saffron",!prefs.getBoolean("saffron",true)).apply();render();}
         if(n==1){prefs.edit().putBoolean("compact",!prefs.getBoolean("compact",false)).apply();render();}
         if(n==2){EditText input=new EditText(this);input.setSingleLine(true);input.setText(prefs.getString("greeting","Your home. Your screen."));new AlertDialog.Builder(this).setTitle("Welcome message").setView(input).setPositiveButton("Save",(x,y)->{String s=input.getText().toString().trim();prefs.edit().putString("greeting",s.isEmpty()?"Your home. Your screen.":s).apply();render();}).setNegativeButton("Cancel",null).show();}
         if(n==3){prefs.edit().remove("hidden").apply();drawApps();}
         if(n==4)launch(new Intent(Settings.ACTION_HOME_SETTINGS));
     }).show();}
-    private void about(){new AlertDialog.Builder(this).setTitle("नाहटा • Nahata TV").setMessage("Developed by Param Nahata\n\nYour home. Your screen.\nVersion 0.1.0 • MIT License\n\nOriginal Android TV launcher. No ads, accounts, analytics or network permission.\n\nLong-press any app to favourite, hide or inspect it. Inputs opens the TV's input settings; available actions depend on the firmware.").setPositiveButton("paramnahata.com",(d,n)->launch(new Intent(Intent.ACTION_VIEW,Uri.parse("https://paramnahata.com")))).setNegativeButton("Close",null).show();}
+    private void about(){new AlertDialog.Builder(this).setTitle("नाहटा • Nahata TV").setMessage("Developed by Param Nahata\n\nYour home. Your screen.\nVersion 0.2.0 • MIT License\n\nOriginal Android TV launcher. No ads, accounts, analytics or network permission.\n\nLong-press any app to favourite, hide or inspect it. Jio opens HDMI 2 on supported TVs.").setPositiveButton("paramnahata.com",(d,n)->launch(new Intent(Intent.ACTION_VIEW,Uri.parse("https://paramnahata.com")))).setNegativeButton("Close",null).show();}
 }
