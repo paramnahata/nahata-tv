@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0
+
+- Separate original day and moonlit night wallpapers automatically follow Light/Dark appearance, plus Sunset and Aurora background choices.
+- Three clear Wi-Fi arcs and a filled signal dot.
+- Removed the large changing app title above the dock; added a discreet bottom-right developer credit.
+- Long-press Rearrange: Left/Right swaps Home apps, OK saves the order locally, Back cancels the draft. All apps retain their installation state.
+- Subtle ambient wallpaper pan/zoom and moving Aurora light, paused when Home loses focus or the app pauses. System reduced-motion and an Ambient motion toggle are respected.
+
 ## 0.4.0
 
 - One centred lower glass dock with a sliding focus highlight and soft app-title transitions.

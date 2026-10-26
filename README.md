@@ -4,9 +4,13 @@
 
 [Website](https://paramnahata.com) · [Feature roadmap](docs/ROADMAP.md) · [Privacy](PRIVACY.md)
 
-## Current development version: 0.4.0
+## Current development version: 0.5.0
 
-The Home now uses one centred lower glass dock, a sliding focus highlight and minimal app-title transitions. Appearance offers Midnight Dark and Pearl Light, with theme-matched native dialogs. Background switches between the bundled original Alpine landscape and Aurora gradients. No instructional copy or widgets appear on Home. See [ASSETS.md](ASSETS.md) for wallpaper provenance and its generation prompt.
+Light and Dark appearance now have separate original daytime and moonlit Alpine wallpapers. Choose Alpine, Sunset or Aurora under Background. Subtle ambient motion can be toggled off and respects system disabled animations. Home has no large selected-app heading; a small developer credit sits at the bottom right.
+
+Hold OK on a Home app → Rearrange. Left/Right moves it, OK saves the order, and Back cancels without changing the saved order. Hidden Home apps remain in Apps.
+
+The Home uses one centred lower glass dock and a sliding focus highlight. Appearance offers Midnight Dark and Pearl Light, with theme-matched native dialogs. No instructional copy or widgets appear on Home. See [ASSETS.md](ASSETS.md) for wallpaper provenance and generation prompts.
 
 Home shows Netflix, Prime Video, YouTube and Live TV by default. Open the compact Apps icon for the complete collection. Hold OK on any app to Show on Home or Hide on Home; hiding never uninstalls it or removes it from Apps. Wi-Fi, input selection, remote help, personalisation, settings and About use compact accessible icon controls. The small Jio shortcut opens HDMI 2 on the verified development TV.
 
