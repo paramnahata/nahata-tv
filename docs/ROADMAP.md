@@ -1,5 +1,7 @@
 # Roadmap — planned, not implemented
 
+Implemented since the first preview: local laptop browser remote, static original scenic wallpaper, dark/light themes, themed dialogs, selective Home apps and verified HDMI 2 switching on the development TV. Remaining items below need device-specific validation or future implementation.
+
 ## Launcher polish
 
 - Original adaptive icon, Android TV banner and shareable screenshots.
@@ -12,8 +14,8 @@
 ## Phone control
 
 - First validate existing Google TV remote on Android and iOS.
-- Evaluate a separately permissioned local companion for browser-based remote control, with authenticated pairing, explicit access revocation and no public ADB exposure.
-- Keyboard text handling, touch navigation and reconnect must be verified separately.
+- Evaluate a TV-hosted companion to remove the existing laptop bridge dependency, with authenticated pairing, explicit access revocation and no public ADB exposure.
+- Unicode typing and independent phone-hardware checks remain pending; the current bridge supports English typing and swipe-to-focus navigation.
 - Bluetooth HID is an optional Android-phone path; iOS parity and gyroscope pointer are not promised.
 
 ## Performance and advertising

@@ -4,3 +4,6 @@ local.properties
 *.jks
 *.keystore
 .idea/
+__pycache__/
+*.pyc
+*pairing*.json

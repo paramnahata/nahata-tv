@@ -1,0 +1,1 @@
+<resources><string name="home_override_description">Return Home to Nahata TV on firmware that forces the stock launcher. Only observes the stock launcher window package. Does not read screen text or capture content. Original launcher mode pauses this until Nahata TV is opened again.</string></resources>

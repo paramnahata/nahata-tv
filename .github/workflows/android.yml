@@ -19,6 +19,10 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x gradlew
       - run: ./gradlew assembleDebug lintDebug
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest discover -s remote -p 'test_*.py'
       - uses: actions/upload-artifact@v4
         with:
           name: Nahata-TV-debug
