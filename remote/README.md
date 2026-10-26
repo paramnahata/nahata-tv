@@ -2,6 +2,8 @@
 
 An original mobile browser remote for Android and iPhone. Local Python bridge controls the TV using an already-authorized ADB connection. No third-party Python dependencies, cloud account or analytics. The laptop must stay awake and connected. This is a browser remote, not a standalone phone app or an offline-installable PWA.
 
+**Need a remote without a laptop?** Use a compatible Google TV mobile remote now; see [laptop-free options and planned native app](../docs/REMOTE.md). Hosting only these web files on a public static/PHP site does not remove the bridge dependency.
+
 ## Start
 
 Use Python 3.10+ and Android Platform Tools. Replace the example addresses and ADB path with your own:

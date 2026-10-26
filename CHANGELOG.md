@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.1
+
+- Configurable Jio passthrough input for other TV firmware; Hisense hardware-ID fallback is restricted to the known development device.
+- Remember the original default Home component when available, rather than assuming every TV uses the same launcher.
+- Phone remote menu distinguishes the official laptop-free Google TV path from the optional laptop browser bridge.
+- Public installation/update/rollback guide, compatibility matrix, remote architecture note and real-device screenshot gallery.
+- Development APK, matching source package, optional laptop bridge and checksums published as a preview release.
+
 ## 0.5.0
 
 - Separate original day and moonlit night wallpapers automatically follow Light/Dark appearance, plus Sunset and Aurora background choices.
